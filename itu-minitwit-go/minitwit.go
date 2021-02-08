@@ -10,7 +10,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/{username}/unfollow", unfollow_user)
-	r.HandleFunc("//add_message", add_message).Methods("POST")
+	r.HandleFunc("/add_message", add_message).Methods("POST")
 
 	http.ListenAndServe(":80", r)
 }
