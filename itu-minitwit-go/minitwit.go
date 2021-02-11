@@ -55,21 +55,48 @@ func before_req(handler func(http.ResponseWriter, *http.Request)) func(http.Resp
 	}
 }
 
+type Request struct {
+	Endpoint string
+}
+
 type Student struct {
 	Name string
 }
 
+
+
+type G struct {
+	User string
+
+}
+
+type Timeline struct {
+	Request Request
+	G G
+	Messages [] string
+}
+
+func url_for(a string, b string) (string) {
+	return a
+}
+
 func public_timeline(w http.ResponseWriter, r *http.Request) {
-	student := Student{
-		Name: "Jo",
+	t := Timeline{
+		Request: Request{
+			Endpoint: "public_timeline",
+		},
 	}
-	parsedTemp, _ := template.ParseFiles("test.html")
-	err := parsedTemp.Execute(w, student)
+	parsedTemp, _ := template.New("test.html").Funcs(template.FuncMap{
+		"url_for": url_for,
+	}).ParseFiles("test.html")
+
+	err := parsedTemp.Execute(w, t)
 	if err != nil {
 		log.Println("Error executing template: ", err)
 		return
 	}
 }
+
 
 
 func main() {
