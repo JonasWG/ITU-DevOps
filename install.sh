@@ -1,3 +1,3 @@
 brew install golang
-go get github.com/gorilla/mux
-go get github.com/lib/pq
+go get github.com/gin-gonic/gin
+

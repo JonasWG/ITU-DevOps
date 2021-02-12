@@ -3,29 +3,43 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"html/template"
+	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	_ "github.com/mattn/go-sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
 )
 
-var db *sql.DB
-var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY"))) // TODO
+var DATABASE = "/tmp/minitwit.db"
+var PER_PAGE = 30
+var DEBUG = true
+var SECRET_KEY = "development key"
 
-func main() {
-	r := mux.NewRouter()
+var (
+	db    *sql.DB
+	user  *string
+	store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY"))) // TODO
+)
 
-	r.HandleFunc("/{username}/unfollow", unfollow_user)
-	r.HandleFunc("/add_message", add_message).Methods("POST")
+type Student struct {
+	Name string
+}
 
-	http.ListenAndServe(":80", r)
+// Returns a new connection to the database.
+func connect_db() *sql.DB {
+	db_, err := sql.Open("sqlite3", DATABASE)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db_
 }
 
 // Convenience method to return the db
-func get_db() (db *sql.DB) {
+func get_db() *sql.DB {
 	return db
 }
 
@@ -35,15 +49,48 @@ func get_user_id(username string) int {
 }
 
 // Convenience method to look up the the user.
-func get_user(r *http.Request) string {
-	return "alma" // TODO
+func get_user() string {
+	return *user
+}
+
+func followUser(w http.ResponseWriter, r *http.Request) {
+	//vars := mux.Vars(r)
+	//username := vars["username"]
+	//user := "jonas"
+	whom_id := 1
+
+	if whom_id <= 0 {
+		w.WriteHeader(http.StatusNotFound)
+	}
+}
+
+func before_req(handler func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		db = connect_db()
+		user = nil
+		defer db.Close()
+		handler(w, r)
+	}
+}
+
+func public_timeline(w http.ResponseWriter, r *http.Request) {
+	student := Student{
+		Name: "Jo",
+	}
+	parsedTemp, _ := template.ParseFiles("test.html")
+	err := parsedTemp.Execute(w, student)
+	if err != nil {
+		log.Println("Error executing template: ", err)
+		return
+	}
 }
 
 // Removes the current user as follower of the given user.
 func unfollow_user(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	username := vars["username"]
-	user := get_user(r)
+	user := get_user()
 
 	if len(user) <= 0 {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -80,4 +127,16 @@ func add_message(w http.ResponseWriter, r *http.Request) {
 	w.Write(successMessage)
 
 	http.Redirect(w, r, "timeline", 302)
+}
+
+func main() {
+	r := mux.NewRouter()
+
+	r.HandleFunc("/{username}/follow", before_req(followUser)).Methods("GET")
+	r.HandleFunc("/", public_timeline).Methods("GET")
+
+	r.HandleFunc("/{username}/unfollow", before_req(unfollow_user))
+	r.HandleFunc("/add_message", before_req(add_message)).Methods("POST")
+
+	http.ListenAndServe(":8080", r) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
