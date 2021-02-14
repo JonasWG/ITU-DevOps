@@ -59,21 +59,35 @@ type Request struct {
 	Endpoint string
 }
 
-type Student struct {
-	Name string
+type User struct {
+	User_id string
+	Username string
 }
 
 
 
 type G struct {
-	User string
+	User User
+}
 
+type Message struct {
+	Username string
+	Email string
+	Text string
+	Pub_date time.Time
 }
 
 type Timeline struct {
 	Request Request
 	G G
-	Messages [] string
+	Messages []Message
+	Profile_user Profile_user
+
+}
+
+type Profile_user struct {
+	User_id string
+	Username string
 }
 
 func url_for(a string, b string) (string) {
@@ -85,6 +99,19 @@ func public_timeline(w http.ResponseWriter, r *http.Request) {
 		Request: Request{
 			Endpoint: "public_timeline",
 		},
+		G: G{
+			User: User{
+				User_id: "0",
+				Username: "Jonas",
+			},
+		},
+		Profile_user: Profile_user{
+			User_id: "0",
+			Username: "Jonas",
+		},
+		Messages: Messages{
+			{[]Message{}}
+		}
 	}
 	parsedTemp, _ := template.New("test.html").Funcs(template.FuncMap{
 		"url_for": url_for,
