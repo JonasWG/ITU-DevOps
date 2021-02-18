@@ -1,0 +1,21 @@
+{{ define "title" }}Public Timeline{{ end }}
+
+{{ define "content" }}
+    <ul class=messages>
+    {{if eq 0 (len .Posts)}}
+        <li><em>No messages to show</em>
+    {{else}}
+        {{ range .Posts }}
+            <li>
+                <p>
+                    <strong>
+                        <a href="/{{.Username}}">{{ .Username}}</a>
+                    </strong>
+                    {{ .Text }}
+                    <small>{{ .Pub_date }}</small>
+                </p>
+            </li>
+        {{ end }}
+        </ul>
+    {{ end }}
+{{ end }}

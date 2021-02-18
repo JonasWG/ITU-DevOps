@@ -1,0 +1,15 @@
+{{ define "title" }}Sign In{{ end }}
+
+{{ define "content" }}
+    <form method="post" action="/signin">
+        <dl>
+            <dt>Username:
+            <dd><input type=text name=username size=30 name="username" required>
+            <dt>Password:
+            <dd><input type=password name=password size=30 required name="password">
+        </dl>
+        <div class=actions><input type=submit value="Sign In"></div>
+    </form>
+
+{{ end }}
+

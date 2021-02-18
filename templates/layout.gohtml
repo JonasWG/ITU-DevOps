@@ -1,0 +1,27 @@
+<!doctype html>
+<title> {{ template "title" . }} | MiniTwit</title>
+<link rel=stylesheet href="/public/css/main.css">
+<link rel="icon" href="https://abs.twimg.com/favicons/twitter.ico">
+<div class=page>
+    <h1>MiniTwit-GO</h1>
+    <div class=navigation>
+        {{if .SignedIn}}
+        <a href="/personaltimeline">My Timeline</a> |
+        <a href="/publictimeline">Public Timeline</a> |
+        <a href="/logout"> Sign out</a>
+        {{else}}
+        <a href="/publictimeline">Public Timeline</a> |
+        <a href="/register">Sign up</a> |
+        <a href="/login">Sign In</a>
+        {{end}}
+    </div>
+    <div class=body>
+        <h2>
+            {{ template "title" . }}
+        </h2>
+        {{ template "content" . }}
+    </div>
+    <div class=footer>
+        Minitwit footer
+    </div>
+</div>
